@@ -1,21 +1,16 @@
-#include "MainMenuLevel.h"
+#include "PauseLevel.h"
 #include "Game/Game.h"
-#include "AStarSimulatorLevel.h"
 
-MainMenuLevel::MainMenuLevel()
+PauseLevel::PauseLevel()
 {
 	// 메뉴 아이템 추가 -> A* 시뮬레이터, 쿼드트리 시뮬레이터, 이진 탐색 트리 시뮬레이터, 프로그램 종료
 	items.emplace_back(new MenuItem(
-		"A Star Simulator",
-		[]() { Game::Get().AddLevel(new AStarSimulatorLevel()); }
-	));
-	items.emplace_back(new MenuItem(
-		"Quad Tree Simulator",
+		"Resume",
 		[]() { /*  dynamic_cast<Game*>(&Game::Get())->SinglePlayStart();  */ }
 	));
 	items.emplace_back(new MenuItem(
-		"Binary Search Tree Simulator",
-		[]() {  }
+		"Return To Main Menu",
+		[]() {}
 	));
 	items.emplace_back(new MenuItem(
 		"Quit",
@@ -25,7 +20,7 @@ MainMenuLevel::MainMenuLevel()
 	length = static_cast<int>(items.size());
 }
 
-MainMenuLevel::~MainMenuLevel()
+PauseLevel::~PauseLevel()
 {
 	for (MenuItem* item : items)
 	{
@@ -35,7 +30,7 @@ MainMenuLevel::~MainMenuLevel()
 	items.clear();
 }
 
-void MainMenuLevel::Tick(float deltaTime)
+void PauseLevel::Tick(float deltaTime)
 {
 	super::Tick(deltaTime);
 
@@ -60,11 +55,11 @@ void MainMenuLevel::Tick(float deltaTime)
 	}
 }
 
-void MainMenuLevel::Render()
+void PauseLevel::Render()
 {
 	Vector2 showPosition(0, 0);
 	Color color = Color::Blue;
-	Game::Get().WriteToBuffer(showPosition, "Simulator", color);
+	Game::Get().WriteToBuffer(showPosition, "Pause", color);
 
 	showPosition.y += 2;
 	for (int ix = 0; ix < length; ++ix)

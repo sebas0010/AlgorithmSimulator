@@ -8,6 +8,14 @@ class Game : public Engine
 public:
 
 	Game();
+	~Game();
+
+	// 메모리 정리 함수
+	void CleanUp() override;
+
+	void CreatePauseLevel();
+	void ToggleMenu();
+	
 
 private:
 	Level* backLevel = nullptr;
