@@ -1,6 +1,7 @@
 #include "MainMenuLevel.h"
 #include "Game/Game.h"
 #include "AStarSimulatorLevel.h"
+#include "BSTSimulatorLevel.h"
 
 MainMenuLevel::MainMenuLevel()
 {
@@ -15,7 +16,7 @@ MainMenuLevel::MainMenuLevel()
 	));
 	items.emplace_back(new MenuItem(
 		"Binary Search Tree Simulator",
-		[]() {  }
+		[]() { Game::Get().AddLevel(new BSTSimulatorLevel()); }
 	));
 	items.emplace_back(new MenuItem(
 		"Quit",

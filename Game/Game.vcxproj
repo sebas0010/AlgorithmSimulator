@@ -165,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Level\AStarSimulatorLevel.cpp" />
+    <ClCompile Include="Level\BSTSimulatorLevel.cpp" />
     <ClCompile Include="Level\MainMenuLevel.cpp" />
     <ClCompile Include="Level\PauseLevel.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="Common\MenuItem.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Level\AStarSimulatorLevel.h" />
+    <ClInclude Include="Level\BSTSimulatorLevel.h" />
     <ClInclude Include="Level\MainMenuLevel.h" />
     <ClInclude Include="Level\PauseLevel.h" />
     <ClInclude Include="Utils\Timer.h" />

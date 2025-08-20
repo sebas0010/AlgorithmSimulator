@@ -6,11 +6,11 @@ PauseLevel::PauseLevel()
 	// 메뉴 아이템 추가 -> A* 시뮬레이터, 쿼드트리 시뮬레이터, 이진 탐색 트리 시뮬레이터, 프로그램 종료
 	items.emplace_back(new MenuItem(
 		"Resume",
-		[]() { /*  dynamic_cast<Game*>(&Game::Get())->SinglePlayStart();  */ }
+		[]() { dynamic_cast<Game*>(&Game::Get())->ToggleMenu(); }
 	));
 	items.emplace_back(new MenuItem(
 		"Return To Main Menu",
-		[]() {}
+		[]() { dynamic_cast<Game*>(&Game::Get())->ReturnToMainMenu(); }
 	));
 	items.emplace_back(new MenuItem(
 		"Quit",

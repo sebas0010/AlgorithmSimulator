@@ -15,7 +15,7 @@ public:
 
 	void CreatePauseLevel();
 	void ToggleMenu();
-	
+	void ReturnToMainMenu();
 
 private:
 	Level* backLevel = nullptr;

@@ -21,4 +21,5 @@ void AStarSimulatorLevel::Tick(float deltaTime)
 
 void AStarSimulatorLevel::Render()
 {
+	Game::Get().WriteToBuffer(Vector2::Zero, "A Star Simulator Level", Color::White);
 }

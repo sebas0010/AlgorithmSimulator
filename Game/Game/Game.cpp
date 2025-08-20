@@ -29,3 +29,9 @@ void Game::ToggleMenu()
 	mainLevel = backLevel;
 	backLevel = temp;
 }
+
+void Game::ReturnToMainMenu()
+{
+	Game::CleanUp();
+	AddLevel(new MainMenuLevel());
+}
