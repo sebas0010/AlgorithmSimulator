@@ -168,6 +168,7 @@
     <ClCompile Include="Level\BSTSimulatorLevel.cpp" />
     <ClCompile Include="Level\MainMenuLevel.cpp" />
     <ClCompile Include="Level\PauseLevel.cpp" />
+    <ClCompile Include="Level\QuadTreeSimulatorLevel.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Utils\Timer.cpp" />
   </ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="Level\BSTSimulatorLevel.h" />
     <ClInclude Include="Level\MainMenuLevel.h" />
     <ClInclude Include="Level\PauseLevel.h" />
+    <ClInclude Include="Level\QuadTreeSimulatorLevel.h" />
     <ClInclude Include="Utils\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

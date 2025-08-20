@@ -2,6 +2,7 @@
 #include "Game/Game.h"
 #include "AStarSimulatorLevel.h"
 #include "BSTSimulatorLevel.h"
+#include "QuadTreeSimulatorLevel.h"
 
 MainMenuLevel::MainMenuLevel()
 {
@@ -12,7 +13,7 @@ MainMenuLevel::MainMenuLevel()
 	));
 	items.emplace_back(new MenuItem(
 		"Quad Tree Simulator",
-		[]() { /*  dynamic_cast<Game*>(&Game::Get())->SinglePlayStart();  */ }
+		[]() { Game::Get().AddLevel(new QuadTreeSimulatorLevel()); }
 	));
 	items.emplace_back(new MenuItem(
 		"Binary Search Tree Simulator",

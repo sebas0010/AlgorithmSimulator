@@ -36,6 +36,9 @@
     <ClCompile Include="Level\BSTSimulatorLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Level\QuadTreeSimulatorLevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils\Timer.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Level\BSTSimulatorLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\QuadTreeSimulatorLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
