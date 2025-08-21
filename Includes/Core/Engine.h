@@ -83,6 +83,12 @@ public:
 	// 싱글톤 접근 함수.
 	static Engine& Get();
 
+	// 일시정지
+	void Pause();
+
+	// 일시정지해제
+	void Resume();
+
 	// 화면 가로/세로 크기 반환 함수.
 	int Width() const;
 	int Height() const;
@@ -116,6 +122,9 @@ protected:
 
 	// 입력 관리자.
 	Input input;
+
+	// 렌더 일시 정지 플래그
+	bool pause = false;
 
 	// 엔진 설정.
 	EngineSettings settings;

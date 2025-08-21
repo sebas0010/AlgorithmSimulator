@@ -1,7 +1,7 @@
 #include "MainMenuLevel.h"
 #include "Game/Game.h"
 #include "AStarSimulatorLevel.h"
-#include "BSTSimulatorLevel.h"
+#include "AVLTreeSimulatorLevel.h"
 #include "QuadTreeSimulatorLevel.h"
 
 MainMenuLevel::MainMenuLevel()
@@ -16,8 +16,8 @@ MainMenuLevel::MainMenuLevel()
 		[]() { Game::Get().AddLevel(new QuadTreeSimulatorLevel()); }
 	));
 	items.emplace_back(new MenuItem(
-		"Binary Search Tree Simulator",
-		[]() { Game::Get().AddLevel(new BSTSimulatorLevel()); }
+		"AVL Tree Simulator",
+		[]() { Game::Get().AddLevel(new AVLTreeSimulator()); }
 	));
 	items.emplace_back(new MenuItem(
 		"Quit",

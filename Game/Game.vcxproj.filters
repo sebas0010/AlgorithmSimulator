@@ -33,10 +33,13 @@
     <ClCompile Include="Level\PauseLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Level\BSTSimulatorLevel.cpp">
+    <ClCompile Include="Level\AVLTreeSimulatorLevel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Level\QuadTreeSimulatorLevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor\NodeActor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,10 +62,13 @@
     <ClInclude Include="Level\PauseLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Level\BSTSimulatorLevel.h">
+    <ClInclude Include="Level\AVLTreeSimulatorLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Level\QuadTreeSimulatorLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor\NodeActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -163,9 +163,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\NodeActor.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Level\AStarSimulatorLevel.cpp" />
-    <ClCompile Include="Level\BSTSimulatorLevel.cpp" />
+    <ClCompile Include="Level\AVLTreeSimulatorLevel.cpp" />
     <ClCompile Include="Level\MainMenuLevel.cpp" />
     <ClCompile Include="Level\PauseLevel.cpp" />
     <ClCompile Include="Level\QuadTreeSimulatorLevel.cpp" />
@@ -173,10 +174,11 @@
     <ClCompile Include="Utils\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\NodeActor.h" />
     <ClInclude Include="Common\MenuItem.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Level\AStarSimulatorLevel.h" />
-    <ClInclude Include="Level\BSTSimulatorLevel.h" />
+    <ClInclude Include="Level\AVLTreeSimulatorLevel.h" />
     <ClInclude Include="Level\MainMenuLevel.h" />
     <ClInclude Include="Level\PauseLevel.h" />
     <ClInclude Include="Level\QuadTreeSimulatorLevel.h" />

@@ -119,6 +119,7 @@ void Engine::Run()
 		{
 			BeginPlay();
 			input.DispatchCallbacks();
+			if (pause) continue;
 			Tick(deltaTime);
 			Render();
 
@@ -277,6 +278,16 @@ void Engine::Quit()
 Engine& Engine::Get()
 {
 	return *instance;
+}
+
+void Engine::Pause()
+{
+	pause = true;
+}
+
+void Engine::Resume()
+{
+	pause = false;
 }
 
 int Engine::Width() const
