@@ -38,6 +38,19 @@ public:
 	// 삽입 직후에 불균형을 찾는 함수
 	void MarkFirstUnbalancedTriplet(NodeActor* inserted);
 
+	// 
+	void ReplaceParent(NodeActor* z, NodeActor* newRoot);
+
+	void RotateRight(NodeActor* z);
+
+	void RotateLeft(NodeActor* z);
+
+	void RotateLeftRight(NodeActor* z);
+
+	void RotateRightLeft(NodeActor* z);
+
+	void DoRotation();
+
 private:
 
 	// AVL 트리의 뿌리
@@ -57,6 +70,11 @@ private:
 
 	// 회전 단계 플래그
 	bool isRotating = false;
+
+	// 회전 단계 노드 포인터
+	NodeActor* rotateNodeX = nullptr;
+	NodeActor* rotateNodeY = nullptr;
+	NodeActor* rotateNodeZ = nullptr;
 
 	// 단계별 작동을 위한 타이머
 	Timer timer;

@@ -65,6 +65,12 @@ void AVLTreeSimulator::Tick(float deltaTime)
 		return;
 	}
 
+	// 노드가 회전하는 과정
+	if (isRotating)
+	{
+		DoRotation();
+	}
+
 
 	// 
 	if (Input::Get().GetKeyDown('I') || Input::Get().GetKeyDown('i'))
@@ -302,7 +308,7 @@ void AVLTreeSimulator::InsertNodeProcessing()
 	// 데이터가 같다면 중복이므로 추가하지 않음
 	else
 	{
-		SafeDelete(addActor);
+		addActor->Destroy();
 		addActor = nullptr;
 		curActor = nullptr;
 		isInserting = false;
@@ -330,10 +336,130 @@ void AVLTreeSimulator::MarkFirstUnbalancedTriplet(NodeActor* inserted)
 				x = (inserted->GetData() < y->GetData()) ? y->GetLeft() : y->GetRight();
 
 			z->ColorChange(Color::Yellow);            // 회전 기준 노드
+			rotateNodeZ = z;
 			if (y) y->ColorChange(Color::RedIntensity); // 자식
+			rotateNodeY = y;
 			if (x) x->ColorChange(Color::Red);          // 손자
-
+			rotateNodeX = x;
+			isRotating = true;
 			return; // 첫 불균형만 처리하면 됨
 		}
 	}
+}
+
+void AVLTreeSimulator::ReplaceParent(NodeActor* oldNode, NodeActor* newNode)
+{
+	NodeActor* p = oldNode->GetParent();
+	if (!p) {
+		treeRoot = newNode;
+		if (newNode) newNode->SetParent(nullptr);
+		return;
+	}
+
+	if (p->GetLeft() == oldNode) p->SetLeft(newNode);
+	else                         p->SetRight(newNode);
+
+	if (newNode) newNode->SetParent(p);
+}
+
+void AVLTreeSimulator::RotateRight(NodeActor* z)
+{
+	if (!z) return;
+
+	NodeActor* y = z->GetLeft();
+	if (!y) return; // 회전 불가
+
+	NodeActor* C = y->GetRight();
+
+	// 부모 교체: z의 자리에 y를 올림
+	ReplaceParent(z, y);
+
+	// y → z
+	y->SetRight(z);
+	z->SetParent(y);
+
+	// z → C
+	z->SetLeft(C);
+	if (C) C->SetParent(z);
+
+	// 루트 갱신
+	if (!y->GetParent())
+		treeRoot = y;
+}
+
+void AVLTreeSimulator::RotateLeft(NodeActor* z)
+{
+	if (!z) return;
+
+	NodeActor* y = z->GetRight();
+	if (!y) return; // 회전 불가
+
+	NodeActor* B = y->GetLeft();
+
+	// 부모 교체: z의 자리에 y를 올림
+	ReplaceParent(z, y);
+
+	// y → z
+	y->SetLeft(z);
+	z->SetParent(y);
+
+	// z → B
+	z->SetRight(B);
+	if (B) B->SetParent(z);
+
+	// 루트 갱신
+	if (!y->GetParent())
+		treeRoot = y;
+}
+
+// z의 왼쪽-오른쪽(LR) 불균형: y(=z->left) 먼저 Left, 그 다음 z에서 Right
+void AVLTreeSimulator::RotateLeftRight(NodeActor* z)
+{
+	if (!z || !z->GetLeft()) return;
+	RotateLeft(z->GetLeft());   // y에서 좌회전
+	RotateRight(z);             // z에서 우회전
+}
+
+// z의 오른쪽-왼쪽(RL) 불균형: y(=z->right) 먼저 Right, 그 다음 z에서 Left
+void AVLTreeSimulator::RotateRightLeft(NodeActor* z)
+{
+	if (!z || !z->GetRight()) return;
+	RotateRight(z->GetRight()); // y에서 우회전
+	RotateLeft(z);              // z에서 좌회전
+}
+
+void AVLTreeSimulator::DoRotation()
+{
+	// z: 첫 불균형 노드, y: z의 삽입 경로 방향 자식, x: y의 삽입 경로 방향 손자
+	if (!rotateNodeZ || !rotateNodeY || !rotateNodeX) return;
+
+	bool yIsLeft = (rotateNodeZ->GetLeft() == rotateNodeY);
+	bool xIsLeft = (rotateNodeY->GetLeft() == rotateNodeX);
+
+	if (yIsLeft && xIsLeft) {
+		// LL
+		RotateRight(rotateNodeZ);
+	}
+	else if (!yIsLeft && !xIsLeft) {
+		// RR
+		RotateLeft(rotateNodeZ);
+	}
+	else if (yIsLeft && !xIsLeft) {
+		// LR
+		RotateLeftRight(rotateNodeZ);
+	}
+	else { // (!yIsLeft && xIsLeft)
+		// RL
+		RotateRightLeft(rotateNodeZ);
+	}
+
+	// 시각화 재배치
+	LocateTree();
+
+	rotateNodeX->ColorChange(Color::White);
+	rotateNodeY->ColorChange(Color::White);
+	rotateNodeZ->ColorChange(Color::White);
+
+	// 포인터 초기화
+	rotateNodeX = rotateNodeY = rotateNodeZ = nullptr;
 }
