@@ -119,10 +119,11 @@ void Engine::Run()
 		{
 			BeginPlay();
 			input.DispatchCallbacks();
-			if (pause) continue;
-			Tick(deltaTime);
-			Render();
-
+			if (!pause)
+			{
+				Tick(deltaTime);
+				Render();
+			}
 			// 시간 업데이트.
 			previousTime = currentTime;
 

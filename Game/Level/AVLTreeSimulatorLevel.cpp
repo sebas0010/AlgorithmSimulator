@@ -69,13 +69,17 @@ void AVLTreeSimulator::Tick(float deltaTime)
 	if (isRotating)
 	{
 		DoRotation();
+		return;
 	}
 
 
-	// 
 	if (Input::Get().GetKeyDown('I') || Input::Get().GetKeyDown('i'))
 	{
-		// 명령 받는 동안 엔진 일시정지
+
+		// 모든 노드 흰색으로 초기화
+		AllNodeWhite();
+		this->Render();
+
 		Game::Get().Pause();
 
 		// 숫자를 입력 받고 노드 추가
@@ -87,10 +91,12 @@ void AVLTreeSimulator::Tick(float deltaTime)
 
 	if (Input::Get().GetKeyDown('a') || Input::Get().GetKeyDown('A'))
 	{
+		AllNodeWhite();
 		StartInsertNode(12);
 	}
 	if (Input::Get().GetKeyDown('b') || Input::Get().GetKeyDown('B'))
 	{
+		AllNodeWhite();
 		StartInsertNode(13);
 	}
 }
@@ -122,6 +128,8 @@ void AVLTreeSimulator::GetInput()
 		int data = std::stoi(inputData);
 		StartInsertNode(data);
 		nodeCount++;
+		timer.SetTargetTime(1.0f);
+		timer.Reset();
 	}
 	catch (...) {
 		// 잘못된 입력이므로 아무것도 하지 않음
@@ -265,7 +273,6 @@ void AVLTreeSimulator::InsertNodeProcessing()
 		if (!curActor->GetLeft())
 		{
 			curActor->SetLeft(addActor);
-			addActor->ColorChange(Color::White);
 			addActor->SetParent(curActor);
 			LocateTree();
 			curActor = nullptr;
@@ -289,7 +296,6 @@ void AVLTreeSimulator::InsertNodeProcessing()
 		if (!curActor->GetRight())
 		{
 			curActor->SetRight(addActor);
-			addActor->ColorChange(Color::White);
 			addActor->SetParent(curActor);
 			LocateTree();
 			curActor = nullptr;
@@ -341,7 +347,11 @@ void AVLTreeSimulator::MarkFirstUnbalancedTriplet(NodeActor* inserted)
 			rotateNodeY = y;
 			if (x) x->ColorChange(Color::Red);          // 손자
 			rotateNodeX = x;
+
+			// 회전 처리를 위한 타이머 설정
 			isRotating = true;
+			timer.Reset();
+
 			return; // 첫 불균형만 처리하면 됨
 		}
 	}
@@ -456,10 +466,22 @@ void AVLTreeSimulator::DoRotation()
 	// 시각화 재배치
 	LocateTree();
 
-	rotateNodeX->ColorChange(Color::White);
-	rotateNodeY->ColorChange(Color::White);
-	rotateNodeZ->ColorChange(Color::White);
-
 	// 포인터 초기화
 	rotateNodeX = rotateNodeY = rotateNodeZ = nullptr;
+	isRotating = false;
+}
+
+// 모든 노드 흰색으로
+void AVLTreeSimulator::AllNodeWhite()
+{
+	AllNodeWhiteRecursive(treeRoot);
+}
+
+void AVLTreeSimulator::AllNodeWhiteRecursive(NodeActor* node)
+{
+	if (!node) return;
+
+	node->ColorChange(Color::White);
+	AllNodeWhiteRecursive(node->GetLeft());
+	AllNodeWhiteRecursive(node->GetRight());
 }

@@ -38,18 +38,19 @@ public:
 	// 삽입 직후에 불균형을 찾는 함수
 	void MarkFirstUnbalancedTriplet(NodeActor* inserted);
 
-	// 
+	// 부모노드 교체 함수
 	void ReplaceParent(NodeActor* z, NodeActor* newRoot);
 
+	// 회전에 필요한 함수
 	void RotateRight(NodeActor* z);
-
 	void RotateLeft(NodeActor* z);
-
 	void RotateLeftRight(NodeActor* z);
-
 	void RotateRightLeft(NodeActor* z);
-
 	void DoRotation();
+
+	// 모든 노드 색깔 흰색으로 초기화 하는 함수
+	void AllNodeWhite();
+	void AllNodeWhiteRecursive(NodeActor* node);
 
 private:
 
