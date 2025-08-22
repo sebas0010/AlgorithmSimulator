@@ -463,7 +463,7 @@ void AVLTreeSimulator::RotateRightLeft(NodeActor* z)
 
 void AVLTreeSimulator::DoRotation()
 {
-	// z: 첫 불균형 노드, y: z의 삽입 경로 방향 자식, x: y의 삽입 경로 방향 손자
+	// z: 첫 불균형 노드, y: z의 자식, x: y의 자식
 	if (!rotateNodeZ || !rotateNodeY || !rotateNodeX) return;
 
 	bool yIsLeft = (rotateNodeZ->GetLeft() == rotateNodeY);
