@@ -36,7 +36,7 @@ public:
 	void InsertNodeProcessing();
 
 	// 삽입 직후에 불균형을 찾는 함수
-	void MarkFirstUnbalancedTriplet(NodeActor* inserted);
+	bool MarkFirstUnbalancedTriplet(NodeActor* inserted);
 
 	// 부모노드 교체 함수
 	void ReplaceParent(NodeActor* z, NodeActor* newRoot);
@@ -57,11 +57,8 @@ private:
 	// AVL 트리의 뿌리
 	NodeActor* treeRoot = nullptr;
 
-	// AVL 트리의 노드 숫자
-	int nodeCount = 0;
-
 	// 노드 추가 단계 플래그
-	bool isInserting = false;
+	int isInserting = 0;
 
 	// 추가 중인 노드 포인터
 	NodeActor* addActor = nullptr;
@@ -70,7 +67,7 @@ private:
 	NodeActor* curActor = nullptr;
 
 	// 회전 단계 플래그
-	bool isRotating = false;
+	int isRotating = 0;
 
 	// 회전 단계 노드 포인터
 	NodeActor* rotateNodeX = nullptr;

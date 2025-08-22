@@ -56,6 +56,14 @@ void AVLTreeSimulator::Tick(float deltaTime)
 	// 노드가 삽입되는 과정
 	if (isInserting)
 	{
+		// 입력시간 동안 deltaTime이 쌓이므로 한번 초기화
+		if (isInserting == 1)
+		{
+			timer.Reset();
+			timer.SetTargetTime(0.7f);
+			isInserting++;
+			return;
+		}
 		timer.Tick(deltaTime);
 		if (timer.IsTimeout())
 		{
@@ -68,7 +76,15 @@ void AVLTreeSimulator::Tick(float deltaTime)
 	// 노드가 회전하는 과정
 	if (isRotating)
 	{
-		DoRotation();
+		if (isRotating == 1)
+		{
+			timer.Reset();
+			timer.SetTargetTime(2.0f);
+			isRotating++;
+			return;
+		}
+		timer.Tick(deltaTime);
+		if(timer.IsTimeout()) DoRotation();
 		return;
 	}
 
@@ -78,15 +94,15 @@ void AVLTreeSimulator::Tick(float deltaTime)
 
 		// 모든 노드 흰색으로 초기화
 		AllNodeWhite();
-		this->Render();
+		//this->Render();
 
-		Game::Get().Pause();
+		//Game::Get().Pause();
 
 		// 숫자를 입력 받고 노드 추가
 		GetInput();
 	
 		// 엔진 동작
-		Game::Get().Resume();
+		//Game::Get().Resume();
 	}
 
 	if (Input::Get().GetKeyDown('a') || Input::Get().GetKeyDown('A'))
@@ -127,9 +143,6 @@ void AVLTreeSimulator::GetInput()
 	try {
 		int data = std::stoi(inputData);
 		StartInsertNode(data);
-		nodeCount++;
-		timer.SetTargetTime(1.0f);
-		timer.Reset();
 	}
 	catch (...) {
 		// 잘못된 입력이므로 아무것도 하지 않음
@@ -259,9 +272,7 @@ void AVLTreeSimulator::StartInsertNode(int data)
 	AddActor(addActor);
 	curActor = treeRoot;
 
-	timer.Reset();
-	timer.SetTargetTime(1.0f);
-	isInserting = true;
+	isInserting++;
 }
 
 void AVLTreeSimulator::InsertNodeProcessing()
@@ -274,13 +285,18 @@ void AVLTreeSimulator::InsertNodeProcessing()
 		{
 			curActor->SetLeft(addActor);
 			addActor->SetParent(curActor);
-			LocateTree();
 			curActor = nullptr;
-			isInserting = false;
+			isInserting = 0;
 
 			// 회전이 필요하면 회전 단계로 넘어감
-			MarkFirstUnbalancedTriplet(addActor);
-
+			if (MarkFirstUnbalancedTriplet(addActor))
+			{
+				Vector2 tmp = addActor->GetParent()->Position();
+				tmp.x -= 4;
+				tmp.y += 2;
+				addActor->SetPosition(tmp);
+			}
+			else LocateTree();
 			return;
 		}
 
@@ -297,13 +313,18 @@ void AVLTreeSimulator::InsertNodeProcessing()
 		{
 			curActor->SetRight(addActor);
 			addActor->SetParent(curActor);
-			LocateTree();
 			curActor = nullptr;
-			isInserting = false;
+			isInserting = 0;
 
 			// 회전이 필요하면 회전 단계로 넘어감
-			MarkFirstUnbalancedTriplet(addActor);
-
+			if (MarkFirstUnbalancedTriplet(addActor))
+			{
+				Vector2 tmp = addActor->GetParent()->Position();
+				tmp.x += 4;
+				tmp.y += 2;
+				addActor->SetPosition(tmp);
+			}
+			else LocateTree();
 			return;
 		}
 		curActor = curActor->GetRight();
@@ -317,14 +338,14 @@ void AVLTreeSimulator::InsertNodeProcessing()
 		addActor->Destroy();
 		addActor = nullptr;
 		curActor = nullptr;
-		isInserting = false;
+		isInserting = 0;
 		return;
 	}
 }
 
-void AVLTreeSimulator::MarkFirstUnbalancedTriplet(NodeActor* inserted)
+bool AVLTreeSimulator::MarkFirstUnbalancedTriplet(NodeActor* inserted)
 {
-	if (!inserted) return;
+	if (!inserted) return false;
 
 	// 삽입된 노드에서 위로 올라가며 첫 불균형 노드(z)를 찾음
 	for (NodeActor* z = inserted->GetParent(); z; z = z->GetParent())
@@ -341,20 +362,22 @@ void AVLTreeSimulator::MarkFirstUnbalancedTriplet(NodeActor* inserted)
 			if (y)
 				x = (inserted->GetData() < y->GetData()) ? y->GetLeft() : y->GetRight();
 
+			AllNodeWhite();
 			z->ColorChange(Color::Yellow);            // 회전 기준 노드
 			rotateNodeZ = z;
 			if (y) y->ColorChange(Color::RedIntensity); // 자식
 			rotateNodeY = y;
-			if (x) x->ColorChange(Color::Red);          // 손자
+			if (x) x->ColorChange(Color::GreenIntensity);          // 손자
 			rotateNodeX = x;
 
 			// 회전 처리를 위한 타이머 설정
-			isRotating = true;
+			isRotating++;
 			timer.Reset();
 
-			return; // 첫 불균형만 처리하면 됨
+			return true; // 첫 불균형만 처리하면 됨
 		}
 	}
+	return false;
 }
 
 void AVLTreeSimulator::ReplaceParent(NodeActor* oldNode, NodeActor* newNode)
@@ -468,7 +491,7 @@ void AVLTreeSimulator::DoRotation()
 
 	// 포인터 초기화
 	rotateNodeX = rotateNodeY = rotateNodeZ = nullptr;
-	isRotating = false;
+	isRotating = 0;
 }
 
 // 모든 노드 흰색으로
