@@ -2,6 +2,7 @@
 
 #include "Actor/Actor.h"
 #include "Utils/Timer.h"
+#include <string>
 
 class NodeActor : public Actor
 { 
@@ -33,6 +34,10 @@ public:
 
 	int GetData() const { return data; }
 
+	void SetData(int newData) {
+		data = newData;
+		this->SetImage(std::to_string(data));
+	}
 private:
 
 	// ºÎ¸ð

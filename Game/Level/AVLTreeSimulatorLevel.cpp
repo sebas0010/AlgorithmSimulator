@@ -88,21 +88,42 @@ void AVLTreeSimulator::Tick(float deltaTime)
 		return;
 	}
 
+	// 노드 삭제 과정
+	if (isDeleting)
+	{
+		timer.Tick(deltaTime);
+		if (isDeleting == 1)
+		{
+			timer.Reset();
+			timer.SetTargetTime(1.0f);
+			isDeleting++;
+			return;
+		}
+		if (timer.IsTimeout())
+		{
+			if (isDeleting == 2)
+			{
+				DeleteNode();
+				return;
+			}
+
+			if (!MarkUnbalancedFrom(rebalancingCur))
+			{
+				isDeleting = 0;
+			}
+
+		}
+		return;
+	}
+
 
 	if (Input::Get().GetKeyDown('I') || Input::Get().GetKeyDown('i'))
 	{
-
 		// 모든 노드 흰색으로 초기화
 		AllNodeWhite();
-		//this->Render();
-
-		//Game::Get().Pause();
 
 		// 숫자를 입력 받고 노드 추가
-		GetInput();
-	
-		// 엔진 동작
-		//Game::Get().Resume();
+		GetInput(0);
 	}
 
 	if (Input::Get().GetKeyDown('a') || Input::Get().GetKeyDown('A'))
@@ -115,6 +136,16 @@ void AVLTreeSimulator::Tick(float deltaTime)
 		AllNodeWhite();
 		StartInsertNode(13);
 	}
+	if (Input::Get().GetKeyDown('c') || Input::Get().GetKeyDown('C'))
+	{
+		DeleteAllNodes();
+	}
+	if (Input::Get().GetKeyDown('d') || Input::Get().GetKeyDown('D'))
+	{
+		AllNodeWhite();
+		// 숫자를 입력 받고 노드 삭제
+		GetInput(1);
+	}
 }
 
 void AVLTreeSimulator::Render()
@@ -126,7 +157,7 @@ void AVLTreeSimulator::Render()
 
 }
 
-void AVLTreeSimulator::GetInput()
+void AVLTreeSimulator::GetInput(int mode)
 {
 
 	// 커서 위치 값 생성 및 커서 이동
@@ -142,7 +173,8 @@ void AVLTreeSimulator::GetInput()
 
 	try {
 		int data = std::stoi(inputData);
-		StartInsertNode(data);
+		if (mode == 0) StartInsertNode(data);
+		else if (mode == 1) DeleteNode(data);
 	}
 	catch (...) {
 		// 잘못된 입력이므로 아무것도 하지 않음
@@ -507,4 +539,184 @@ void AVLTreeSimulator::AllNodeWhiteRecursive(NodeActor* node)
 	node->ColorChange(Color::White);
 	AllNodeWhiteRecursive(node->GetLeft());
 	AllNodeWhiteRecursive(node->GetRight());
+}
+
+void AVLTreeSimulator::DeleteAllNodes()
+{
+	DeleteAllNodesRecursive(treeRoot);
+	treeRoot = nullptr;
+}
+
+void AVLTreeSimulator::DeleteAllNodesRecursive(NodeActor* node)
+{
+	if (!node) return;
+
+	DeleteAllNodesRecursive(node->GetLeft());
+	DeleteAllNodesRecursive(node->GetRight());
+
+	// 액터 삭제 예약 (엔진이 나중에 실제 제거)
+	node->Destroy();
+}
+
+void AVLTreeSimulator::DeleteNode(int data)
+{
+	deleteNode = FindNode(data);
+	if (!deleteNode) return;
+
+	isDeleting++;
+}
+
+NodeActor* AVLTreeSimulator::FindNode(int data) const
+{
+	NodeActor* cur = treeRoot;
+	while (cur)
+	{
+		if (data == cur->GetData())
+		{
+			cur->ColorChange(Color::RedIntensity);
+			return cur; // 찾음
+		}
+		else if (data < cur->GetData())
+		{
+			cur = cur->GetLeft();
+		}
+		else
+		{
+			cur = cur->GetRight();
+		}
+	}
+	return nullptr; // 없음
+}
+
+// 오른쪽 서브트리에서 최솟값(중위 후속자)
+static NodeActor* MinNode(NodeActor* n) {
+	while (n && n->GetLeft()) n = n->GetLeft();
+	return n;
+}
+
+// 부모에서 oldChild 링크를 newChild로 교체
+void AVLTreeSimulator::LinkFromParent(NodeActor* oldChild, NodeActor* newChild) {
+	NodeActor* p = oldChild ? oldChild->GetParent() : nullptr;
+	if (!p) {
+		treeRoot = newChild;
+		if (newChild) newChild->SetParent(nullptr);
+		return;
+	}
+	if (p->GetLeft() == oldChild) p->SetLeft(newChild);
+	else                          p->SetRight(newChild);
+	if (newChild) newChild->SetParent(p);
+}
+
+// 삭제 후 위로 올라가며 AVL 리밸런싱 (여러 번 회전될 수 있음)
+void AVLTreeSimulator::RebalanceUpwards(NodeActor* start) {
+	for (NodeActor* z = start; z; z = z->GetParent()) {
+		int lh = TreeHeight(z->GetLeft());
+		int rh = TreeHeight(z->GetRight());
+		int bf = lh - rh;
+
+		if (bf > 1) {
+			NodeActor* y = z->GetLeft();
+			int ylh = TreeHeight(y ? y->GetLeft() : nullptr);
+			int yrh = TreeHeight(y ? y->GetRight() : nullptr);
+			if (ylh >= yrh) RotateRight(z);     // LL
+			else             RotateLeftRight(z); // LR
+		}
+		else if (bf < -1) {
+			NodeActor* y = z->GetRight();
+			int ylh = TreeHeight(y ? y->GetLeft() : nullptr);
+			int yrh = TreeHeight(y ? y->GetRight() : nullptr);
+			if (yrh >= ylh) RotateLeft(z);      // RR
+			else             RotateRightLeft(z); // RL
+		}
+
+		// 루트 안전 갱신
+		while (treeRoot && treeRoot->GetParent()) treeRoot = treeRoot->GetParent();
+	}
+	// 회전(재배치)까지 끝난 뒤 좌표 갱신
+	LocateTree();
+	isDeleting = 0;
+}
+
+void AVLTreeSimulator::DeleteNode()
+{
+	if (!deleteNode) return;
+
+	// 리밸런싱 시작 기준(삭제된 자리의 부모) 기억
+	rebalancingCur = deleteNode->GetParent();
+
+	// 1) 자식이 둘이면: 중위 후속자 s를 찾아 deleteNode와 값만 스왑 후, s(0/1자식)를 제거
+	if (deleteNode->GetLeft() && deleteNode->GetRight()) {
+		NodeActor* s = MinNode(deleteNode->GetRight());
+
+		// --- 데이터 스왑 ---
+		int tmp = deleteNode->GetData();
+		deleteNode->SetData(s->GetData());
+		s->SetData(tmp);
+
+		// 실제로 제거할 노드를 후속자 s로 바꾸고, 그 부모를 리밸런스 시작점으로
+		deleteNode = s;
+		rebalancingCur = deleteNode->GetParent();
+	}
+
+	// 2) 여기로 내려오면 deleteNode는 자식이 0개 또는 1개
+	NodeActor* child = deleteNode->GetLeft() ? deleteNode->GetLeft() : deleteNode->GetRight();
+
+	// 부모 링크 교체
+	LinkFromParent(deleteNode, child);
+
+	// 노드 제거
+	deleteNode->SetLeft(nullptr);
+	deleteNode->SetRight(nullptr);
+	deleteNode->SetParent(nullptr);
+	deleteNode->Destroy();
+
+	// 3) 위로 올라가며 리밸런싱
+	if (rebalancingCur)
+	{
+		if (MarkUnbalancedFrom(rebalancingCur)) isDeleting++;
+		else
+		{
+			LocateTree();
+			isDeleting = 0;
+		}
+	}
+	else {
+		// 트리가 비었거나 루트만 남은 케이스
+		LocateTree();
+		isDeleting = 0;
+	}
+}
+
+bool AVLTreeSimulator::MarkUnbalancedFrom(NodeActor* start)
+{
+	for (NodeActor* z = start; z; z = z->GetParent())
+	{
+		int lh = TreeHeight(z->GetLeft());
+		int rh = TreeHeight(z->GetRight());
+		int bf = lh - rh;
+
+		if (std::abs(bf) > 1)
+		{
+			NodeActor* y = (bf > 1) ? z->GetLeft() : z->GetRight(); // 더 무거운 쪽
+			NodeActor* x = nullptr;
+			if (y) {
+				int ylh = TreeHeight(y->GetLeft());
+				int yrh = TreeHeight(y->GetRight());
+				// y의 더 무거운 쪽 손자 선택
+				x = (ylh >= yrh) ? y->GetLeft() : y->GetRight();
+			}
+
+			AllNodeWhite();
+			z->ColorChange(Color::Yellow);
+			rotateNodeZ = z;
+			if (y) { y->ColorChange(Color::RedIntensity); rotateNodeY = y; }
+			if (x) { x->ColorChange(Color::GreenIntensity); rotateNodeX = x; }
+
+			rebalancingCur = z->GetParent();
+			isRotating++;
+			timer.Reset();
+			return true;
+		}
+	}
+	return false;
 }

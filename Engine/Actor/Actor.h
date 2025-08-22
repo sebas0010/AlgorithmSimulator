@@ -5,6 +5,8 @@
 #include "Math/Color.h"
 #include "RTTI.h"
 
+#include <string>
+
 // 전방 선언.
 class Level;
 class Engine_API Actor : public RTTI
@@ -40,6 +42,10 @@ public:
 
 	// 문자열 길이 반환.
 	int Width() const;
+
+	// 문자열 변경
+	void SetImage(const char* s);
+	void SetImage(const std::string& s);
 
 	// Sorting Order 설정.
 	void SetSortingOrder(unsigned int sortingOrder);

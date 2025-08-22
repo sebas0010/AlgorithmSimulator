@@ -63,6 +63,26 @@ int Actor::Width() const
 	return width;
 }
 
+void Actor::SetImage(const char* s)
+{
+	if (!s) s = "";
+	int newLen = (int)std::strlen(s);
+
+	// 새 버퍼 할당
+	char* newBuf = new char[newLen + 1];
+	std::memcpy(newBuf, s, newLen + 1);
+
+	// 기존 버퍼 해제 후 교체
+	SafeDeleteArray(image);
+	image = newBuf;
+	width = newLen;
+}
+
+void Actor::SetImage(const std::string& s)
+{
+	SetImage(s.c_str());
+}
+
 void Actor::SetSortingOrder(unsigned int sortingOrder)
 {
 	this->sortingOrder = sortingOrder;

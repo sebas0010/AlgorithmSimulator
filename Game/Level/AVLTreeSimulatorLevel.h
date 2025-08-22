@@ -14,8 +14,8 @@ public:
 	void Tick(float deltaTime) override;
 	void Render() override;
 
-	// 노드 추가를 위한 입력을 받는 함수
-	void GetInput();
+	// 노드 추가/삭제를 위한 입력을 받는 함수
+	void GetInput(int mode);
 
 	// 트리 위치를 위한 함수
 	void LocateTree();
@@ -52,6 +52,27 @@ public:
 	void AllNodeWhite();
 	void AllNodeWhiteRecursive(NodeActor* node);
 
+	// 모든 노드 삭제 함수
+	void DeleteAllNodes();
+	void DeleteAllNodesRecursive(NodeActor* node);
+
+	// 노드 삭제 설정 함수 -> 노드 삭제 함수를 부름
+	void DeleteNode(int data);
+
+	// 노드를 찾는 함수
+	NodeActor* FindNode(int data) const;
+
+	// 노드 삭제를 위한 함수
+	void LinkFromParent(NodeActor* oldChild, NodeActor* newChild);
+
+	// 노드 삭제 후 리밸런싱 하는 함수
+	void RebalanceUpwards(NodeActor* start);
+
+	// 노드 삭제 함수
+	void DeleteNode();
+
+	// 삭제 이후 불균형 노드 탐색
+	bool MarkUnbalancedFrom(NodeActor* start);
 private:
 
 	// AVL 트리의 뿌리
@@ -73,6 +94,15 @@ private:
 	NodeActor* rotateNodeX = nullptr;
 	NodeActor* rotateNodeY = nullptr;
 	NodeActor* rotateNodeZ = nullptr;
+
+	// 노드 삭제 단계 플래그
+	int isDeleting = 0;
+
+	// 삭제 대상 노드
+	NodeActor* deleteNode = nullptr;
+
+	// 리밸런싱 대상 노드
+	NodeActor* rebalancingCur = nullptr;
 
 	// 단계별 작동을 위한 타이머
 	Timer timer;
