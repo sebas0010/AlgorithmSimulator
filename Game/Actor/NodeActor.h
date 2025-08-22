@@ -15,18 +15,23 @@ public:
 	// 색깔 코드에 맞게 색깔 바꾸는 함수
 	void ColorChange();
 
+	// 색깔 바꾸는 함수
+	void ColorChange(Color newColor);
+
 	// 깜빡이는 신호
 	void Blink();
 
 	// 부모 자식 노드 Getter/Setter
-	const NodeActor* GetParent() const { return parent; }
+	NodeActor* GetParent() const { return parent; }
 	void SetParent(NodeActor* newParent) { parent = newParent; }
 
-	const NodeActor* GetLeft() const { return left; }
+	NodeActor* GetLeft() const { return left; }
 	void SetLeft(NodeActor* newLeft) { left = newLeft; }
 
-	const NodeActor* GetRight() const { return right; }
+	NodeActor* GetRight() const { return right; }
 	void SetRight(NodeActor* newRight) { right = newRight; }
+
+	int GetData() const { return data; }
 
 private:
 

@@ -300,6 +300,11 @@ int Engine::Height() const
 	return settings.height;
 }
 
+void Engine::SetCursorPosition(COORD position)
+{
+	SetConsoleCursorPosition(GetRenderer()->buffer, position);
+}
+
 void Engine::BeginPlay()
 {
 	if (mainLevel)

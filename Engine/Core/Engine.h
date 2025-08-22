@@ -11,10 +11,10 @@
 struct EngineSettings
 {
 	// 콘솔 화면 가로 크기.
-	int width = 100;
+	int width = 200;
 
 	// 콘솔 화면 세로 크기.
-	int height = 35;
+	int height = 50;
 
 	// 타겟 프레임 속도.
 	float framerate = 120.0f;
@@ -92,6 +92,8 @@ public:
 	// 화면 가로/세로 크기 반환 함수.
 	int Width() const;
 	int Height() const;
+
+	void SetCursorPosition(COORD position);
 
 protected:
 	void BeginPlay();

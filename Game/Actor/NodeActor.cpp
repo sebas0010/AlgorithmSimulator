@@ -60,6 +60,11 @@ void NodeActor::ColorChange()
     }
 }
 
+void NodeActor::ColorChange(Color newColor)
+{
+    color = newColor;
+}
+
 void NodeActor::Blink()
 {
     blink++;
