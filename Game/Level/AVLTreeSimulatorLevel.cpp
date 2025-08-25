@@ -46,6 +46,14 @@ AVLTreeSimulator::~AVLTreeSimulator()
 
 void AVLTreeSimulator::Tick(float deltaTime)
 {
+	// 스페이스바 누르면 일시정지
+	if (Input::Get().GetKeyDown(VK_SPACE))
+	{
+		pause = !pause;
+	}
+
+	if (pause) return;
+
 	super::Tick(deltaTime);
 	// esc 누르면 일시정지
 	if (Input::Get().GetKeyDown(VK_ESCAPE))
@@ -151,7 +159,9 @@ void AVLTreeSimulator::Tick(float deltaTime)
 void AVLTreeSimulator::Render()
 {
 	super::Render();
-	Game::Get().WriteToBuffer(Vector2::Zero, "AVL Tree Simulator", Color::BlueIntensity);
+
+	if(pause) Game::Get().WriteToBuffer(Vector2::Zero, "Pause", Color::BlueIntensity);
+	else Game::Get().WriteToBuffer(Vector2::Zero, "AVL Tree Simulator", Color::BlueIntensity);
 
 	Game::Get().WriteToBuffer(Vector2(0, 3), "I : 노드 추가, D : 노드 삭제, C : 모든 노드 삭제", Color::White);
 
@@ -325,6 +335,7 @@ void AVLTreeSimulator::InsertNodeProcessing()
 			{
 				Vector2 tmp = addActor->GetParent()->Position();
 				tmp.x -= 4;
+				if (tmp.x < 0) tmp.x = 0;
 				tmp.y += 2;
 				addActor->SetPosition(tmp);
 			}

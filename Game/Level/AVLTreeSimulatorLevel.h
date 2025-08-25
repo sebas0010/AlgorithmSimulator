@@ -75,6 +75,9 @@ public:
 	bool MarkUnbalancedFrom(NodeActor* start);
 private:
 
+	// 레벨 일시정지 플래그
+	bool pause = false;
+
 	// AVL 트리의 뿌리
 	NodeActor* treeRoot = nullptr;
 
