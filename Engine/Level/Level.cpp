@@ -102,11 +102,13 @@ void Level::Tick(float deltaTime)
 
 void Level::Render()
 {
-	// Render Pass.
-	for (Actor* const actor : actors)
+	for (int i = 0; i < 3; i++)
 	{
-		// 드로우 콜.
-		actor->Render();
+		// Render Pass.
+		for (Actor* const actor : actors)
+		{
+			if(actor->GetSortingOrder() == i) actor->Render();
+		}
 	}
 }
 

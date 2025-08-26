@@ -88,6 +88,11 @@ void Actor::SetSortingOrder(unsigned int sortingOrder)
 	this->sortingOrder = sortingOrder;
 }
 
+unsigned int Actor::GetSortingOrder() const
+{
+	return sortingOrder;
+}
+
 void Actor::SetOwner(Level* newOwner)
 {
 	owner = newOwner;

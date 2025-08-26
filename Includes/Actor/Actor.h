@@ -49,7 +49,7 @@ public:
 
 	// Sorting Order 설정.
 	void SetSortingOrder(unsigned int sortingOrder);
-
+	unsigned int GetSortingOrder() const;
 	// 오너십 설정.
 	void SetOwner(Level* newOwner);
 	Level* GetOwner();
