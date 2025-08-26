@@ -19,6 +19,8 @@ public:
 	void insert();
 	// 삽입 완료 표시
 	void insertFinish(int id, Vector2 position);
+	// 삽입 완료
+	void InsertFinish();
 
 	// 화면 좌표 Getter
 	int GetMinX() const { return minX; }

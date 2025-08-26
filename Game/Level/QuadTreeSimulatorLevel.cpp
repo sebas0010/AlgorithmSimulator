@@ -11,6 +11,7 @@ QuadTreeSimulatorLevel::QuadTreeSimulatorLevel()
 	dynamic_cast<Game*>(&Game::Get())->CreatePauseLevel();
 
 	root = new QuadNode(minX, maxX, maxY, minY, 0);
+	AddActor(root);
 }
 
 QuadTreeSimulatorLevel::~QuadTreeSimulatorLevel()
@@ -92,6 +93,13 @@ void QuadTreeSimulatorLevel::insertFinish(int id, Vector2 position)
 
 	QuadObject* newObject = new QuadObject(id, Color::White, position);
 	AddActor(newObject);
+	root->Insert(newObject);
+	isInserting = false;
+
 	objectId++;
+}
+
+void QuadTreeSimulatorLevel::InsertFinish()
+{
 	isInserting = false;
 }
