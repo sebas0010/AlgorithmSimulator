@@ -14,7 +14,7 @@ struct EngineSettings
 	int width = 200;
 
 	// 콘솔 화면 세로 크기.
-	int height = 50;
+	int height = 70;
 
 	// 타겟 프레임 속도.
 	float framerate = 120.0f;

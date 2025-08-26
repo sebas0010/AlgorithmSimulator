@@ -164,6 +164,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor\NodeActor.cpp" />
+    <ClCompile Include="Actor\QuadNode.cpp" />
+    <ClCompile Include="Actor\QuadObject.cpp" />
+    <ClCompile Include="Actor\QuadPlayer.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Level\AStarSimulatorLevel.cpp" />
     <ClCompile Include="Level\AVLTreeSimulatorLevel.cpp" />
@@ -175,6 +178,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\NodeActor.h" />
+    <ClInclude Include="Actor\QuadNode.h" />
+    <ClInclude Include="Actor\QuadObject.h" />
+    <ClInclude Include="Actor\QuadPlayer.h" />
     <ClInclude Include="Common\MenuItem.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Level\AStarSimulatorLevel.h" />
