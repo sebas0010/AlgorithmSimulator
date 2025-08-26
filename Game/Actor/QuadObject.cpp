@@ -3,7 +3,7 @@
 QuadObject::QuadObject(int id, Color color, Vector2 position)
 	: Actor(std::to_string(id).c_str(), color, position), id(id)
 {
-	
+	super::sortingOrder = 1;
 }
 
 void QuadObject::Tick(float deltaTime)

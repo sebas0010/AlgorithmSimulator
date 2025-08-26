@@ -10,7 +10,7 @@ class QuadNode : public Actor
 	RTTI_DECLARATIONS(QuadNode, Actor)
 
 public:
-	QuadNode(int xLeft, int xRight, int yDown, int yUp, int depth);
+	QuadNode(int xLeft, int xRight, int yDown, int yUp, int depth, Color color);
 
 	void Tick(float deltaTime) override;
 	void Render() override;
@@ -51,7 +51,6 @@ private:
 
 	// 이펙트 발생 시 거쳐가는 색깔
 	Color colorEffect = Color::White;
-	Color colorIntensity = Color::White;
 	Color colorOrigin = Color::White;
 
 	// 이펙트 발생 시 색깔 코드

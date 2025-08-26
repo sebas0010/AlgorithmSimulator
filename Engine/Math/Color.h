@@ -14,4 +14,13 @@ enum class Color : int
 	BlueIntensity = Blue | Intensity,
 	GreenIntensity = Green | Intensity,
 	YellowIntensity = Yellow | Intensity
+
+
 };
+
+inline Color operator|(Color lhs, Color rhs)
+{
+	return static_cast<Color>(
+		static_cast<int>(lhs) | static_cast<int>(rhs)
+		);
+}

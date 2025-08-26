@@ -2,22 +2,25 @@
 #include "Game/Game.h"
 #include "Level/QuadTreeSimulatorLevel.h"
 
-QuadNode::QuadNode(int xLeft, int xRight, int yDown, int yUp, int depth)
+QuadNode::QuadNode(int xLeft, int xRight, int yDown, int yUp, int depth, Color color)
 	: xLeft(xLeft), xRight(xRight), yDown(yDown), yUp(yUp), depth(depth)
 {
+	super::color = color;
+	colorOrigin = color;
 	timer.Reset();
-	timer.SetTargetTime(0.2f);
+	timer.SetTargetTime(0.4f);
 }
 
 void QuadNode::Tick(float deltaTime)
 {
 	if (dividing > 0)
 	{
-		if (code == 12)
+		if (code == 7)
 		{
 			code = 0;
 			DevideProcess();
 			dividing = 0;
+			return;
 		}
 		timer.Tick(deltaTime);
 		if (timer.IsTimeout())
@@ -45,6 +48,7 @@ void QuadNode::Render()
 		drawPosition.y++;
 		drawPosition2.y++;
 	}
+	drawPosition.y = yDown;
 	Game::Get().WriteToBuffer(drawPosition, screenLine.c_str(), color);
 }
 
@@ -86,12 +90,12 @@ void QuadNode::DevideStart()
 void QuadNode::DevideProcess()
 {
 	int midX = (xLeft + xRight - 1) / 2;
-	int midY = (yDown + yUp -1) / 2;
+	int midY = (yDown + yUp - 1) / 2;
 
-	leftDownNode = new QuadNode(xLeft, midX, yDown, midY, depth + 1);
-	rightDownNode = new QuadNode(midX + 1, xRight, yDown, midY, depth + 1);
-	leftUpNode = new QuadNode(xLeft, midX, midY + 1, yUp, depth + 1);
-	rightUpNode = new QuadNode(midX + 1, xRight, midY + 1, yUp, depth + 1);
+	leftDownNode = new QuadNode(xLeft, midX, yDown, midY + 1, depth + 1, Color::RedIntensity);
+	rightDownNode = new QuadNode(midX + 1, xRight, yDown, midY + 1, depth + 1, Color::BlueIntensity);
+	leftUpNode = new QuadNode(xLeft, midX, midY, yUp, depth + 1, Color::GreenIntensity);
+	rightUpNode = new QuadNode(midX + 1, xRight, midY, yUp, depth + 1, Color::YellowIntensity);
 
 	owner->AddActor(leftDownNode);
 	owner->AddActor(rightDownNode);
@@ -125,23 +129,14 @@ void QuadNode::DevideProcess()
 
 void QuadNode::ColorChange()
 {
-	switch (code % 4)
+	if (code % 2 == 0)
 	{
-	case 0:
-		color = colorIntensity;
-		code++;
-		break;
-	case 1:
 		color = colorEffect;
 		code++;
-		break;
-	case 2:
-		color = colorIntensity;
-		code++;
-		break;
-	case 3:
+	}
+	else
+	{
 		color = colorOrigin;
 		code++;
-		break;
 	}
 }
