@@ -33,10 +33,10 @@ public:
 	int dividing = 0;
 private:
 	// 최대 깊이
-	int maxDepth = 4;
+	int maxDepth = 3;
 
 	// 용량
-	int capacity = 2;
+	int capacity = 0;
 
 	// 노드의 사각형 좌표
 	int xLeft;

@@ -46,6 +46,46 @@ AVLTreeSimulator::~AVLTreeSimulator()
 
 void AVLTreeSimulator::Tick(float deltaTime)
 {
+	// 입력 중
+	if (isInputting)
+	{
+		for (int i = 0; i < 9; i++)
+		{
+			if (Input::Get().GetKeyDown(0x30 + i))
+			{
+				// 두 자리수 제한
+				if (inputValue > 10) return;
+				inputValue = inputValue * 10 + i;
+				return;
+			}
+
+			// esc 키를 누르면 취소
+			if (Input::Get().GetKeyDown(VK_ESCAPE))
+			{
+				inputValue = 0;
+				isInputting = false;
+				return;
+			}
+
+			// 엔터 키를 누르면 입력 끝
+			if (Input::Get().GetKeyDown(VK_RETURN))
+			{
+				if (inputValue == 0)
+				{
+					isInputting = false;
+					inputValue = 0;
+					return;
+				}
+
+				if (mode == 0) StartInsertNode(inputValue);
+				else if (mode == 1) DeleteNode(inputValue);
+				isInputting = false;
+				inputValue = 0;
+				return;
+			}
+		}
+	}
+	
 	// 스페이스바 누르면 일시정지
 	if (Input::Get().GetKeyDown(VK_SPACE))
 	{
@@ -55,7 +95,7 @@ void AVLTreeSimulator::Tick(float deltaTime)
 	if (pause) return;
 
 	super::Tick(deltaTime);
-	// esc 누르면 일시정지
+	// esc 누르면 일시정지메뉴로 이동
 	if (Input::Get().GetKeyDown(VK_ESCAPE))
 	{
 		dynamic_cast<Game*>(&Game::Get())->ToggleMenu();
@@ -164,31 +204,18 @@ void AVLTreeSimulator::Render()
 	else Game::Get().WriteToBuffer(Vector2::Zero, "AVL Tree Simulator", Color::BlueIntensity);
 
 	Game::Get().WriteToBuffer(Vector2(0, 3), "I : 노드 추가, D : 노드 삭제, C : 모든 노드 삭제", Color::White);
+	if (isInputting)
+	{
+		Game::Get().WriteToBuffer(Vector2(0, 4), "Input Value : ", Color::White);
+		if(inputValue > 0) Game::Get().WriteToBuffer(Vector2(14, 4), std::to_string(inputValue).c_str(), Color::White);
+	}
 
 }
 
 void AVLTreeSimulator::GetInput(int mode)
 {
-
-	// 커서 위치 값 생성 및 커서 이동
-	//COORD coord{ 0, 4 };
-	//Utils::SetConsolePosition(coord);
-	static COORD coord{ 0, 4 };
-	Engine::Get().SetCursorPosition(coord);
-
-	// 입력 받음
-	std::string inputData;
-	std::cin >> inputData;
-
-
-	try {
-		int data = std::stoi(inputData);
-		if (mode == 0) StartInsertNode(data);
-		else if (mode == 1) DeleteNode(data);
-	}
-	catch (...) {
-		// 잘못된 입력이므로 아무것도 하지 않음
-	}
+	isInputting = true;
+	this->mode = mode;
 }
 
 void AVLTreeSimulator::LocateTree()

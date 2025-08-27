@@ -78,6 +78,15 @@ private:
 	// 레벨 일시정지 플래그
 	bool pause = false;
 
+	// 입력중임을 표시하는 플래그
+	bool isInputting = false;
+
+	// 입력 값
+	int inputValue = 0;
+
+	// 삭제 또는 입력. 입력 : 0, 삭제 : 1
+	int mode = 0;
+
 	// AVL 트리의 뿌리
 	NodeActor* treeRoot = nullptr;
 
