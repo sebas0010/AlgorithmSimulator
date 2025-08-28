@@ -58,7 +58,7 @@ void AVLTreeSimulator2::Tick(float deltaTime)
 			}
 		}
 	}
-	
+
 	// 스페이스바 누르면 일시정지
 	if (Input::Get().GetKeyDown(VK_SPACE))
 	{
@@ -142,6 +142,222 @@ void AVLTreeSimulator2::Tick(float deltaTime)
 		return;
 	}
 
+	if (isDeleting)
+	{
+		// 노드 안보이게 하고 깜빡임 신호
+		if (isDeleting == 1)
+		{
+			DeleteProcess();
+			return;
+		}
+		// 노드 깜빡임 멈추기 기다렸다가 다음단계로 이동
+		else if (isDeleting == 2)
+		{
+			if (!deletingNode->visible) isDeleting++;
+			return;
+		}
+		else if (isDeleting == 3)
+		{
+			// 자식 노드가 없는 경우
+			if (!deletingNode->GetLeft() && !deletingNode->GetRight())
+			{
+				ReplaceChild(deletingNode->GetParent(), deletingNode, nullptr);
+				z = deletingNode->GetParent();
+				deletingNode->Destroy();
+				deletingNode = nullptr;
+				isDeleting = 5;
+				return;
+			}
+			// 자식 노드가 1개인 경우
+			else if (!deletingNode->GetLeft() || !deletingNode->GetRight())
+			{
+				AVLNode* child = deletingNode->GetLeft() ? deletingNode->GetLeft() : deletingNode->GetRight();
+				ReplaceChild(deletingNode->GetParent(), deletingNode, child);
+				MoveNode(child, deletingNode->Position());
+				z = child->GetParent();
+				deletingNode->Destroy();
+				deletingNode = nullptr;
+				isDeleting = 4;
+				return;
+			}
+			// 자식 노드가 2개인 경우
+			else
+			{
+				AVLNode* succ = deletingNode->GetRight();
+
+				while (succ->GetLeft()) succ = succ->GetLeft();
+
+				AVLNode* parent = deletingNode->GetParent();
+				AVLNode* left = deletingNode->GetLeft();
+				AVLNode* right = deletingNode->GetRight();
+				AVLNode* succParent = succ->GetParent();
+				AVLNode* succRight = succ->GetRight();
+
+				if (right == succ) {
+					// succ이 deletingNode의 '직접 오른쪽 자식' ──
+					ReplaceChild(parent, deletingNode, succ);
+
+					succ->SetLeft(left);
+					if (left) left->SetParent(succ);
+
+					deletingNode->SetRight(succRight);
+					if (succRight) succRight->SetParent(deletingNode);
+					succ->SetRight(deletingNode); deletingNode->SetParent(succ);
+
+					deletingNode->SetLeft(nullptr);
+				}
+				else {
+					// succ이 오른쪽 서브트리 더 아래(왼쪽 사슬) ──
+					ReplaceChild(succParent, succ, deletingNode);   // succ 자리에는 deletingNode가 올라감
+					deletingNode->SetLeft(nullptr);                 // succ 자리는 왼쪽 없음
+					deletingNode->SetRight(succRight);
+					if (succRight) succRight->SetParent(deletingNode);
+
+					ReplaceChild(parent, deletingNode, succ);       // deletingNode 자리에는 succ이 올라감
+					succ->SetLeft(left);
+					if (left) left->SetParent(succ);
+					succ->SetRight(right);
+					if (right) right->SetParent(succ);
+				}
+
+
+				// deletingNode를 트리에서 먼저 분리한 뒤 파괴
+				AVLNode* parentDel = deletingNode->GetParent();
+				AVLNode* childDel = deletingNode->GetRight(); // 후계자 자리 특성상 왼쪽은 없음
+				ReplaceChild(parentDel, deletingNode, childDel);
+
+				MoveNode(root, rootPosition);
+
+				z = parentDel; // 불균형 탐색 시작점
+
+				deletingNode->Destroy();
+				deletingNode = nullptr;
+
+				isDeleting = 4;
+				return;
+			}
+		}
+		else if (isDeleting == 4)
+		{
+			if (IsAllNodeStop())
+			{
+				// 불균형 검사로 이동
+				isDeleting = 5;
+				return;
+			}
+		}
+		else if (isDeleting == 5)
+		{
+			// 불균형 검사
+			while (z && std::abs(BalanceFactor(z)) <= 1) {
+				z = z->GetParent();
+			}
+
+			if (!z) {
+				// 불균형 노드 없음
+				isDeleting = 0;
+				z = nullptr;
+				y = nullptr;
+				x = nullptr;
+				return;
+			}
+
+			y = (BalanceFactor(z) > 0) ? z->GetLeft() : z->GetRight();
+
+			if (y)
+			{
+				x = (BalanceFactor(y) > 0) ? y->GetLeft() : y->GetRight();
+			}
+			else
+			{
+				x = nullptr;
+			}
+			
+			if (z) z->ChangeColor(Color::RedIntensity);
+			if (y) y->ChangeColor(Color::GreenIntensity);
+			if (x) x->ChangeColor(Color::BlueIntensity);
+
+			// 회전 단계로 이동
+			isDeleting = 6;
+			return;
+		}
+		else if (isDeleting == 6)
+		{
+			// 불균형 형태 검사
+			isDeleting += DetectCase() + 1;
+		}
+		else if (isDeleting == 7)
+		{
+			// LL
+			RotateRight(z);
+			if (rotateLevel == 2)
+			{
+				z->ChangeColor(Color::White);
+				y->ChangeColor(Color::White);
+				x->ChangeColor(Color::White);
+
+				// 불균형 탐색으로 돌아감
+				isDeleting = 5;
+			}
+		}
+		else if (isDeleting == 8)
+		{
+			// LR
+			if (rotateLevel == 0 || rotateLevel == 1)
+			{
+				// LR z의 왼쪽 자손 기준 기준 RotateLeft, z 기준 RotateRight
+				if (z && z->GetLeft()) RotateLeft(z->GetLeft());
+			}
+			else if (rotateLevel == 2)
+			{
+				isDeleting = 7;
+				rotateLevel = 0;
+				return;
+			}
+		}
+		else if (isDeleting == 9)
+		{
+			// RL
+			if (rotateLevel == 0 || rotateLevel == 1)
+			{
+				// RL z의 오른쪽 RotateRight, z 기준 RotateLeft
+				if (z && z->GetRight()) RotateRight(z->GetRight());
+			}
+			else if (rotateLevel == 2)
+			{
+				rotateLevel = 0;
+				isDeleting = 10;
+				return;
+			}
+		}
+		else if (isDeleting == 10)
+		{
+			// RR
+			RotateLeft(z);
+			if (rotateLevel == 2) {
+				z->ChangeColor(Color::White);
+				y->ChangeColor(Color::White);
+				x->ChangeColor(Color::White);
+
+				// 불균형 탐색으로 돌아감
+				isDeleting = 5;
+			}
+		}
+	}
+
+	if (allClear)
+	{
+		if (!root) { allClear = false; return; }      // ← 널 가드
+		if (root->visible) return;                    // 깜빡임 끝날 때까지 대기
+
+		DeleteAllRecursive(root);
+		root = nullptr;                               // ← 댕글링 방지 (매우 중요)
+		z = y = x = deletingNode = insertingNode = comparingNode = nullptr;
+		isInserting = 0; isDeleting = 0;
+		allClear = false;
+		return;
+	}
+
 	// i 키 누르면 노드 삽입을 위한 입력을 받음
 	if (Input::Get().GetKeyDown('i') || Input::Get().GetKeyDown('I'))
 	{
@@ -155,8 +371,22 @@ void AVLTreeSimulator2::Tick(float deltaTime)
 	// d 키 누르면 노드 삭제를 위한 입력을 받음
 	if (Input::Get().GetKeyDown('d') || Input::Get().GetKeyDown('D'))
 	{
+		if (nodeCount == 0)
+		{
+			return;
+		}
 		isInputting = true;
 		mode = false;
+	}
+	// c 키 누르면 모든 노드 삭제
+	if (Input::Get().GetKeyDown('c') || Input::Get().GetKeyDown('C'))
+	{
+		if (nodeCount == 0)
+		{
+			return;
+		}
+		nodeCount = 0;
+		DeleteAll();
 	}
 }
 
@@ -167,6 +397,8 @@ void AVLTreeSimulator2::Render()
 	if (pause) Game::Get().WriteToBuffer(Vector2::Zero, "Pause", Color::RedIntensity);
 	else if(isInputting) Game::Get().WriteToBuffer(Vector2::Zero, "Inputting", Color::BlueIntensity);
 	else if(isInserting) Game::Get().WriteToBuffer(Vector2::Zero, "Inserting", Color::RedIntensity);
+	else if(isDeleting) Game::Get().WriteToBuffer(Vector2::Zero, "Deleting", Color::RedIntensity);
+	else if(allClear) Game::Get().WriteToBuffer(Vector2::Zero, "Clearing", Color::RedIntensity);
 	else Game::Get().WriteToBuffer(Vector2::Zero, "AVL Tree Simulator 2", Color::BlueIntensity);
 
 	Game::Get().WriteToBuffer(Vector2(0, 3), "I : 노드 추가, D : 노드 삭제, C : 모든 노드 삭제", Color::White);
@@ -219,6 +451,7 @@ void AVLTreeSimulator2::InsertProcess()
 		root->MoveStart(rootPosition, 100.0f);
 		isInserting = 0;
 		nodeCount++;
+		insertingNode->ChangeColor(Color::White);
 		return;
 	}
 
@@ -232,6 +465,7 @@ void AVLTreeSimulator2::InsertProcess()
 	{
 		isInserting++;
 		nodeCount++;
+		insertingNode->ChangeColor(Color::White);
 		return;
 	}
 	
@@ -290,18 +524,18 @@ void AVLTreeSimulator2::InsertPost()
 			x = nullptr;
 			if (y) x = (insertingNode->GetData() < y->GetData()) ? y->GetLeft() : y->GetRight();
 			
-			z->ChangeColor(Color::Red);
-			y->ChangeColor(Color::Green);
-			x->ChangeColor(Color::Blue);
+			z->ChangeColor(Color::RedIntensity);
+			y->ChangeColor(Color::GreenIntensity);
+			x->ChangeColor(Color::BlueIntensity);
 
-			DetectCase();
+			isInserting = 3 + DetectCase();
 			return;
 		}
 	}
 	isInserting = 0;
 }
 
-void AVLTreeSimulator2::DetectCase()
+int AVLTreeSimulator2::DetectCase()
 {
 	const bool yIsLeft = (z->GetLeft() == y);
 	const bool xIsLeft = (y->GetLeft() == x);
@@ -313,26 +547,22 @@ void AVLTreeSimulator2::DetectCase()
 	if (yIsLeft && xIsLeft)
 	{
 		// LL
-		isInserting = 3;
-		return;
+		return 0;
 	}
 	if (yIsLeft && xIsRight)
 	{
 		// LR
-		isInserting = 4;
-		return;
+		return 1;
 	}
 	if (yIsRight && xIsLeft)
 	{
 		// RL
-		isInserting = 5;
-		return;
+		return 2;
 	}
 	if (yIsRight && xIsRight)
 	{
 		// RR
-		isInserting = 6;
-		return;
+		return 3;
 	}
 }
 
@@ -438,10 +668,50 @@ bool AVLTreeSimulator2::IsAllNodeStopRecursive(AVLNode* node)
 		IsAllNodeStopRecursive(node->GetRight());
 }
 
+// 삭제할 노드를 찾고 없다면 함수 종료, 있다면 삭제
 void AVLTreeSimulator2::DeleteStart(int data)
 {
+	deletingNode = FindNode(data);
+	if (!deletingNode) return;
+	nodeCount--;
+	isDeleting++;
 }
 
-void AVLTreeSimulator2::DeleteProcess(int data)
+void AVLTreeSimulator2::DeleteProcess()
 {
+	deletingNode->Blink();
+	isDeleting++;
+}
+
+void AVLTreeSimulator2::DeleteAll()
+{
+	BlinkAll(root);
+	allClear = true;
+}
+
+void AVLTreeSimulator2::DeleteAllRecursive(AVLNode* node)
+{
+	if (!node) return;
+	DeleteAllRecursive(node->GetLeft());
+	DeleteAllRecursive(node->GetRight());
+	node->Destroy();
+}
+
+void AVLTreeSimulator2::BlinkAll(AVLNode* node)
+{
+	if (!node) return;
+	BlinkAll(node->GetLeft());
+	BlinkAll(node->GetRight());
+	node->Blink();
+}
+
+AVLNode* AVLTreeSimulator2::FindNode(int key)
+{
+	AVLNode* cur = root;
+	while (cur) {
+		if (key < cur->GetData()) cur = cur->GetLeft();
+		else if (key > cur->GetData()) cur = cur->GetRight();
+		else return cur;
+	}
+	return nullptr;
 }

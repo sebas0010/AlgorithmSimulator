@@ -31,7 +31,7 @@ public:
 	}
 
 	// 불균형 형태 판단 함수
-	void DetectCase();
+	int DetectCase();
 	
 	// 자손 노드 교체 함수
 	void ReplaceChild(AVLNode* parent, AVLNode* oldChild, AVLNode* newChild);
@@ -49,7 +49,18 @@ public:
 
 	// 노드 삭제 함수
 	void DeleteStart(int data);
-	void DeleteProcess(int data);
+	void DeleteProcess();
+
+	// 모든 노드 삭제 함수
+	void DeleteAll();
+	void DeleteAllRecursive(AVLNode* node);
+
+	// 모든 노드 깜빡임 함수
+	void BlinkAll(AVLNode* root);
+
+	// 노드 검색 함수
+	AVLNode* FindNode(int key);
+
 private:
 	// 일시 정지 플래그
 	bool pause = false;
@@ -93,14 +104,23 @@ private:
 	// 노드 회전 단계 진행 변수
 	int rotateLevel = 0;
 
+	// 모든 노드 삭제 플래그
+	int allClear = false;
+
 	// 노드 회전 단계에서 사용할 임시 포인터
 	AVLNode* b = nullptr;
 	AVLNode* c = nullptr;
 
-	// 삽입 상태에서 불균형노드
+	// 삽입, 삭제 상태에서 불균형노드
 	AVLNode* z = nullptr;
 	AVLNode* y = nullptr;
 	AVLNode* x = nullptr;
+
+	// 삭제 상태 단계 변수
+	int isDeleting = 0;
+
+	// 삭제할 노드 포인터
+	AVLNode* deletingNode = nullptr;
 
 	// 숫자 출력을 위한 문자열
 	const std::string bigNumber[10][5] =

@@ -5,13 +5,35 @@ AVLNode::AVLNode(int data, Vector2 position)
 	: data(data)
 {
 	super::position = position;
-	color = Color::White;
+	color = Color::GreenIntensity;
 	timer.Reset();
 	timer.SetTargetTime(0.4f);
+
+	blinkTimer.Reset();
+	blinkTimer.SetTargetTime(0.4f);
 }
 
 void AVLNode::Tick(float deltaTime)
 {
+	if (blink)
+	{
+		timer.Tick(deltaTime);
+		if (timer.IsTimeout())
+		{
+			timer.Reset();
+			if (color == Color::White) color = Color::RedIntensity;
+			else color = Color::White;
+			blinkCount++;
+		}
+		if (blinkCount == 6)
+		{
+			color = Color::White;
+			blink = false;
+			blinkCount = 0;
+			visible = false;
+		}
+	}
+	
 	if (isMoving)
 	{
 		Vector2 dir = targetPosition - position; // 방향 벡터
@@ -47,6 +69,8 @@ void AVLNode::Tick(float deltaTime)
 
 void AVLNode::Render()
 {
+	if (!visible) return;
+
 	Vector2 drawPosition;
 
 	// 숫자 그리기
@@ -137,8 +161,11 @@ void AVLNode::Render()
 	drawPosition.x += 20;
 	Game::Get().WriteToBuffer(drawPosition, "#", color);
 
+	
+
 	// 부모와 연결하는 선 그리기
-	if (parent == nullptr) return;
+	if (parent == nullptr || !parent->visible) return;
+
 	int x0 = parent->Position().x;
 	int y0 = parent->Position().y;
 	int x1 = position.x;
@@ -173,4 +200,9 @@ void AVLNode::MoveStart(Vector2 targetPosition, float speed)
 	yLocation = (float)position.y;
 	this->targetPosition = targetPosition;
 	isMoving = true;
+}
+
+void AVLNode::Blink()
+{
+	blink = true;
 }

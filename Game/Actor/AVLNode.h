@@ -19,6 +19,9 @@ public:
 	// 색깔 바꾸기
 	void ChangeColor(Color newColor) { color = newColor; }
 
+	// 깜빡임 신호 받는 함수
+	void Blink();
+
 	// 부모 자식 노드 Getter/Setter
 	AVLNode* GetParent() const { return parent; }
 	void SetParent(AVLNode* newParent) { parent = newParent; }
@@ -32,6 +35,9 @@ public:
 	int GetData() const { return data; }
 
 	bool IsMoving() const { return isMoving; }
+
+	// 보이기 or 투명
+	bool visible = true;
 private:
 	// 부모
 	AVLNode* parent = nullptr;
@@ -46,7 +52,13 @@ private:
 	int data;
 
 	// 깜빡이기 위한 플래그
-	int blink = 0;
+	bool blink = false;
+
+	// 깜빡이기 위한 타이머
+	Timer blinkTimer;
+
+	// 깜빡임 횟수
+	int blinkCount = 0;
 
 	// 색깔 코드
 	int code = 0;
@@ -66,6 +78,7 @@ private:
 
 	// 이동 속도
 	float moveSpeed = 80;
+
 
 	const std::string bigNumber[10][5] =
 	{
