@@ -3,6 +3,7 @@
 #include "AStarSimulatorLevel.h"
 #include "AVLTreeSimulatorLevel.h"
 #include "QuadTreeSimulatorLevel.h"
+#include "AVLTreeSimulatorLevel2.h"
 
 MainMenuLevel::MainMenuLevel()
 {
@@ -18,6 +19,10 @@ MainMenuLevel::MainMenuLevel()
 	items.emplace_back(new MenuItem(
 		"AVL Tree Simulator",
 		[]() { Game::Get().AddLevel(new AVLTreeSimulator()); }
+	));
+	items.emplace_back(new MenuItem(
+		"AVL Tree Simulator 2",
+		[]() { Game::Get().AddLevel(new AVLTreeSimulator2()); }
 	));
 	items.emplace_back(new MenuItem(
 		"Quit",

@@ -16,20 +16,6 @@ AVLTreeSimulator::AVLTreeSimulator()
 	// 일시정지 레벨 생성
 	dynamic_cast<Game*>(&Game::Get())->CreatePauseLevel();
 
-	/*treeRoot = new NodeActor(15, Vector2(0, 5));
-	AddActor(treeRoot);
-	NodeActor* tmp = new NodeActor(10, Vector2(0, 5));
-	treeRoot->SetLeft(tmp);
-	AddActor(tmp);
-	tmp = new NodeActor(20, Vector2(0, 5));
-	treeRoot->SetRight(tmp);
-	AddActor(tmp);
-	
-	tmp = new NodeActor(25, Vector2(0, 5));
-	treeRoot->GetRight()->SetRight(tmp);
-	AddActor(tmp);
-
-	LocateTree();*/
 
 	InsertNode(15);
 	InsertNode(7);
@@ -64,6 +50,13 @@ void AVLTreeSimulator::Tick(float deltaTime)
 			{
 				inputValue = 0;
 				isInputting = false;
+				return;
+			}
+			
+			// backspace 키를 누르면 한글자 지움
+			if (Input::Get().GetKeyDown(VK_BACK))
+			{
+				inputValue /= 10;
 				return;
 			}
 
