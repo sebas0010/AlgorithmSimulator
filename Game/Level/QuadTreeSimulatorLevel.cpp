@@ -10,7 +10,7 @@ QuadTreeSimulatorLevel::QuadTreeSimulatorLevel()
 	// 일시정지 레벨 생성
 	dynamic_cast<Game*>(&Game::Get())->CreatePauseLevel();
 
-	root = new QuadNode(minX, maxX, maxY, minY, 0, Color::White);
+	root = new QuadNode(minX, maxX, maxY, minY, 0, Color::GreenIntensity);
 	AddActor(root);
 }
 

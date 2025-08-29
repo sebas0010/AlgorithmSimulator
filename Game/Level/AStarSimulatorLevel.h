@@ -14,5 +14,9 @@ public:
 	void Render() override;
 
 private:
-
+	
+	int leftX = 1;
+	int rightX = 100;
+	int upY = 3;
+	int downY = 32;
 };
