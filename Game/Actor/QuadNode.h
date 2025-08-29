@@ -33,7 +33,7 @@ public:
 	int dividing = 0;
 private:
 	// 최대 깊이
-	int maxDepth = 3;
+	int maxDepth = 4;
 
 	// 용량
 	int capacity = 0;
