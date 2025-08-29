@@ -35,7 +35,7 @@ void AVLTreeSimulator::Tick(float deltaTime)
 	// ภิทย ม฿
 	if (isInputting)
 	{
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			if (Input::Get().GetKeyDown(0x30 + i))
 			{
