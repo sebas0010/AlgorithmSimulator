@@ -163,6 +163,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\AStarPlayer.cpp" />
     <ClCompile Include="Actor\AVLNode.cpp" />
     <ClCompile Include="Actor\NodeActor.cpp" />
     <ClCompile Include="Actor\QuadNode.cpp" />
@@ -179,6 +180,8 @@
     <ClCompile Include="Utils\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\AStarNode.h" />
+    <ClInclude Include="Actor\AStarPlayer.h" />
     <ClInclude Include="Actor\AVLNode.h" />
     <ClInclude Include="Actor\NodeActor.h" />
     <ClInclude Include="Actor\QuadNode.h" />

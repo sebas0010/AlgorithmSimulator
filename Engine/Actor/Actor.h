@@ -46,6 +46,12 @@ public:
 	// 문자열 변경
 	void SetImage(const char* s);
 	void SetImage(const std::string& s);
+	// 문자열 Getter
+	std::string GetImage() const { return image; }
+
+	// id Getter/Setter
+	int GetId() const { return id; }
+	void SetId(int newId) { id = newId; }
 
 	// Sorting Order 설정.
 	void SetSortingOrder(unsigned int sortingOrder);
@@ -70,6 +76,9 @@ protected:
 
 	// 문자열 길이.
 	int width = 0;
+
+	// 액터 id 변수
+	int id = 0;
 
 	// 텍스트 색상 값.
 	Color color;

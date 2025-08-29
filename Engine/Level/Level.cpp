@@ -102,7 +102,7 @@ void Level::Tick(float deltaTime)
 
 void Level::Render()
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		// Render Pass.
 		for (Actor* const actor : actors)
