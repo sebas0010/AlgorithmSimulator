@@ -80,4 +80,18 @@ private:
 
 	// 이동 후보 노드
 	std::priority_queue<AStarNode*, std::vector<AStarNode*>, CompareNodePtr> open;
+
+	struct VecHash {
+		size_t operator()(const Vector2& p) const noexcept {
+			return (static_cast<size_t>(p.x) << 32) ^ static_cast<size_t>(p.y);
+		}
+	};
+	struct VecEq {
+		bool operator()(const Vector2& a, const Vector2& b) const noexcept {
+			return a.x == b.x && a.y == b.y;
+		}
+	};
+
+	std::unordered_map<Vector2, int, VecHash, VecEq> gScore;
+	std::unordered_set<Vector2, VecHash, VecEq> closed;
 };

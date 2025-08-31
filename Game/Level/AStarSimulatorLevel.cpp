@@ -178,86 +178,95 @@ void AStarSimulatorLevel::Simulator()
 
 void AStarSimulatorLevel::StartAStar()
 {
-	// open 큐 초기화
 	Vector2 goalPos = goal->Position();
 	open = decltype(open)(CompareNodePtr(goalPos));
-
-	// 시작 노드 생성 (g = 0)
 	Vector2 startPos = start->Position();
-	AStarNode* startNode = new AStarNode(startPos, 0, goalPos);
+	auto* startNode = new AStarNode(startPos, 0, goalPos);
+	gScore.clear(); closed.clear();
+	gScore[startPos] = 0;
 
 	AddActor(startNode);
-
 	open.push(startNode);
 	inProcess = 1;
 }
 
 void AStarSimulatorLevel::StepAStar()
 {
-	// 큐가 비어있으면 경로 불가능
-	if (open.empty()) {
-		Finish(); // 경로 없음
+	// 유효 노드를 찾을 때까지 pop (프레임당 1개 확장)
+	while (!open.empty())
+	{
+		// open 에서 하나 꺼내기
+		AStarNode* current = open.top();
+		open.pop();
+		Vector2 cpos = current->Position();
+
+		// 이미 확정(closed)이면 스킵 (lazy deletion)
+		if (closed.count(cpos)) continue;
+
+		// 낡은 엔트리면 스킵 (큐 안에 더 좋은 g 가 있었던 경우)
+		auto itg = gScore.find(cpos);
+		if (itg != gScore.end() && current->GetG() > itg->second) continue;
+
+		// 목표 도착 여부 확인
+		if (cpos == goal->Position())
+		{
+			Finish(current);
+			return;
+		}
+
+		// 현재 노드 확정 처리
+		current->visited = true;      // (시각화용)
+		closed.insert(cpos);
+
+		// 4방 이웃
+		static const int dx[4] = { 1, -1, 0, 0 };
+		static const int dy[4] = { 0, 0, 1, -1 };
+
+		for (int i = 0; i < 4; i++)
+		{
+			Vector2 npos(cpos.x + dx[i], cpos.y + dy[i]);
+
+			// ① 맵 경계 확인
+			if (npos.x < minX || npos.x > maxX || npos.y < minY || npos.y > maxY)
+				continue;
+
+			// ② 벽 체크 (actors에 "#" 있는지 검사: GetId()==1)
+			bool isWall = false;
+			for (Actor* a : actors)
+			{
+				if (a->Position() == npos && a->GetId() == 1) {
+					isWall = true;
+					break;
+				}
+			}
+			if (isWall) continue;
+
+			// 이미 확정이면 패스
+			if (closed.count(npos)) continue;
+
+			// g 후보
+			const int tentative = current->GetG() + 1;
+
+			// 더 좋을 때만 갱신/푸시
+			auto itg2 = gScore.find(npos);
+			if (itg2 == gScore.end() || tentative < itg2->second)
+			{
+				gScore[npos] = tentative;
+
+				AStarNode* neighbor = new AStarNode(npos, tentative, goal->Position());
+				neighbor->SetParent(current);
+				AddActor(neighbor);
+
+				open.push(neighbor);
+			}
+		}
+
+		// 이 프레임에서는 유효 노드 1개만 확장
 		return;
 	}
 
-	// open 에서 하나 꺼내기
-	AStarNode* current = open.top();
-	open.pop();
-
-	// 목표 도착 여부 확인
-	if (current->Position() == goal->Position())
-	{
-		Finish(current);
-		return;
-	}
-
-	// 현재 노드 방문 처리
-	current->visited = true;
-
-	// 4. 이웃 좌표 정의 (상, 하, 좌, 우)
-	static const int dx[4] = { 1, -1, 0, 0 };
-	static const int dy[4] = { 0, 0, 1, -1 };
-
-	for (int i = 0; i < 4; i++)
-	{
-		Vector2 neighborPos(current->Position().x + dx[i],
-			current->Position().y + dy[i]);
-
-		// ① 맵 경계 확인
-		if (neighborPos.x < minX || neighborPos.x > maxX ||
-			neighborPos.y < minY || neighborPos.y > maxY)
-			continue;
-
-		// ② 벽 체크 (actors에 "#" 있는지 검사)
-		bool isWall = false;
-		for (Actor* actor : actors) {
-			if (actor->Position() == neighborPos &&
-				actor->GetId() == 1) {
-				isWall = true;
-				break;
-			}
-		}
-		if (isWall) continue;
-
-		// ③ 이미 방문한 노드인지 확인
-		bool visited = false;
-		for (Actor* actor : actors) {
-			AStarNode* node = dynamic_cast<AStarNode*>(actor);
-			if (node && node->Position() == neighborPos && node->visited) {
-				visited = true;
-				break;
-			}
-		}
-		if (visited) continue;
-
-		// ④ 새 이웃 노드 생성
-		AStarNode* neighbor = new AStarNode(neighborPos, current->GetG() + 1, goal->Position());
-		neighbor->SetParent(current);
-		AddActor(neighbor);
-
-		// ⑤ open 큐에 push
-		open.push(neighbor);
-	}
+	// 큐를 다 비웠는데도 목표를 못 찾았으면 실패
+	Finish(); // 경로 없음
 }
 
 void AStarSimulatorLevel::Finish(AStarNode* node)
