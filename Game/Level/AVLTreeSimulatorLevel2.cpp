@@ -347,11 +347,11 @@ void AVLTreeSimulator2::Tick(float deltaTime)
 
 	if (allClear)
 	{
-		if (!root) { allClear = false; return; }      // ← 널 가드
+		if (!root) { allClear = false; return; }      // 널 가드
 		if (root->visible) return;                    // 깜빡임 끝날 때까지 대기
 
 		DeleteAllRecursive(root);
-		root = nullptr;                               // ← 댕글링 방지 (매우 중요)
+		root = nullptr;                               
 		z = y = x = deletingNode = insertingNode = comparingNode = nullptr;
 		isInserting = 0; isDeleting = 0;
 		allClear = false;
@@ -601,7 +601,7 @@ void AVLTreeSimulator2::RotateRight(AVLNode* a)
 {
 	if (rotateLevel == 0)
 	{
-		b = a->GetLeft();             // 새 축
+		b = a->GetLeft();
 		c = b ? b->GetRight() : nullptr;
 
 		ReplaceChild(a->GetParent(), a, b);
